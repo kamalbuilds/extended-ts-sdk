@@ -49,6 +49,6 @@ class DefaultLogger implements Logger {
   }
 }
 
-export function getLogger(name: string): Logger {
+export function getLogger(_name: string): Logger {
   return new DefaultLogger();
 }

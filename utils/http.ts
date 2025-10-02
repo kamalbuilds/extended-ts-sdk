@@ -1,8 +1,7 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { RateLimitException, NotAuthorizedException, X10Error } from '../errors';
 import { DEFAULT_REQUEST_TIMEOUT_SECONDS, USER_AGENT } from '../config';
 import { getLogger } from './log';
-import { X10BaseModel } from './model';
 
 const logger = getLogger('http');
 
@@ -62,7 +61,7 @@ export class HttpClient {
 
   constructor(baseURL?: string, timeout: number = DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000) {
     this.client = axios.create({
-      baseURL,
+      ...(baseURL && { baseURL }),
       timeout,
       headers: {
         [RequestHeader.ACCEPT]: 'application/json',

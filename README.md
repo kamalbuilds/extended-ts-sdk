@@ -1,4 +1,4 @@
-# TypeScript SDK Transformation Report
+# Extended TypeScript SDK 
 
 **Project**: Transform Python SDK to TypeScript SDK 
 
