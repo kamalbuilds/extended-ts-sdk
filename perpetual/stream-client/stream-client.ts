@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import { EventEmitter } from 'events';
 import { getLogger } from '../../utils/log';
-import { WrappedStreamResponse, StreamDataType } from '../../utils/http';
+import { WrappedStreamResponse } from '../../utils/http';
 import { EndpointConfig } from '../../config';
 
 const logger = getLogger('StreamClient');

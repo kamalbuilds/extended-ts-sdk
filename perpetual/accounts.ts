@@ -55,7 +55,7 @@ export class StarkPerpetualAccount {
 
   sign(msgHash: bigint): [bigint, bigint] {
     try {
-      const signature = sign(this.privateKey, msgHash);
+      const signature = sign(this.privateKey.toString(16), msgHash.toString(16));
       return [signature.r, signature.s];
     } catch (error) {
       throw new SigningError(`Failed to sign message: ${error}`);

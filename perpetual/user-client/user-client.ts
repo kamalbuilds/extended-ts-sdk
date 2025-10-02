@@ -1,11 +1,9 @@
 import { ethers } from 'ethers';
-import { HttpClient, WrappedApiResponse } from '../../utils/http';
+import { HttpClient } from '../../utils/http';
 import { EndpointConfig } from '../../config';
 import { getLogger } from '../../utils/log';
 import {
   OnboardedClientModel,
-  OnboardingPayload,
-  SubAccountOnboardingPayload,
   StarkKeyPair,
   deriveL2KeysFromL1Account,
   createOnboardingPayload,

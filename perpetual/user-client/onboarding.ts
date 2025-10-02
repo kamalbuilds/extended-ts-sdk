@@ -47,11 +47,12 @@ export interface OnboardingPayload {
 }
 
 export function createStarkKeyPair(privateKey: bigint): StarkKeyPair {
-  const publicKey = getPublicKey(privateKey);
+  const publicKey = getPublicKey(privateKey.toString(16));
+  const publicKeyBigInt = BigInt('0x' + publicKey);
   return {
     private: privateKey,
-    public: BigInt(publicKey),
-    publicHex: '0x' + BigInt(publicKey).toString(16),
+    public: publicKeyBigInt,
+    publicHex: '0x' + publicKeyBigInt.toString(16),
     privateHex: '0x' + privateKey.toString(16),
   };
 }
@@ -150,14 +151,14 @@ export async function deriveL2KeysFromL1Account(
   signingDomain: string
 ): Promise<StarkKeyPair> {
   const typedData = createKeyDerivationMessage(accountIndex, wallet.address, signingDomain);
-  const signature = await wallet._signTypedData(
-    JSON.parse(typedData).domain,
-    JSON.parse(typedData).types,
-    JSON.parse(typedData).message
+  const parsed = JSON.parse(typedData);
+  const signature = await wallet.signTypedData(
+    parsed.domain,
+    parsed.types,
+    parsed.message
   );
 
   const privateKey = BigInt(signature);
-  const publicKey = getPublicKey(privateKey);
 
   return createStarkKeyPair(privateKey);
 }
@@ -175,22 +176,23 @@ export async function createOnboardingPayload(
   const registration = createAccountRegistration(0, wallet.address, timestamp, REGISTER_ACTION, host);
 
   const typedData = createSignableMessage(registration, signingDomain);
-  const l1Signature = await wallet._signTypedData(
-    JSON.parse(typedData).domain,
-    JSON.parse(typedData).types,
-    JSON.parse(typedData).message
+  const parsed = JSON.parse(typedData);
+  const l1Signature = await wallet.signTypedData(
+    parsed.domain,
+    parsed.types,
+    parsed.message
   );
 
   const l2Message = pedersen(BigInt(wallet.address), keyPair.public);
-  const [l2R, l2S] = starkSign(keyPair.private, l2Message);
+  const signature = starkSign(keyPair.private.toString(16), l2Message.toString());
 
   return {
     l1Signature,
     l2Key: keyPair.public,
-    l2R,
-    l2S,
+    l2R: signature.r,
+    l2S: signature.s,
     accountRegistration: registration,
-    referralCode,
+    ...(referralCode && { referralCode }),
   };
 }
 
@@ -213,12 +215,12 @@ export function createSubAccountOnboardingPayload(
   );
 
   const l2Message = pedersen(BigInt(l1Address), keyPair.public);
-  const [l2R, l2S] = starkSign(keyPair.private, l2Message);
+  const signature = starkSign(keyPair.private.toString(16), l2Message.toString());
 
   return {
     l2Key: keyPair.public,
-    l2R,
-    l2S,
+    l2R: signature.r,
+    l2S: signature.s,
     accountRegistration: registration,
     description,
   };
